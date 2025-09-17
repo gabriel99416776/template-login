@@ -2,7 +2,7 @@
 
 include("./conexao.php");
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email"], $_POST["tel"], $_POST["senha"])) {
     $nome = $_POST["nome"];
     $email = $_POST["email"];
     $tel = $_POST["tel"];
@@ -22,4 +22,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         echo "Erro ao cadastrar usuário: " . $stmt->error;
     }
     $stmt->close();
+    exit;
 }
