@@ -13,6 +13,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email
         header("location: index.php?erro=3");
         exit;
     }
+
+
+    $stmt = $conn->prepare("SELECT id FROM tbl_usuarios WHERE email = ? OR celular = ?");
+    $stmt->bind_param("ss", $email, $tel);
+    $stmt->execute();
+    $stmt->store_result();
+    if($stmt->num_rows > 0) {
+        header("location: index.php?erro=4");
+        $stmt->close();
+        exit;
+    }
+
+
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare("INSERT INTO tbl_usuarios (`nome`, `email`, `celular`, `senha`) VALUES (?, ?, ?, ?)");

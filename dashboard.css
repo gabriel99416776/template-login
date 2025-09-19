@@ -22,7 +22,7 @@ body {
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
   transition: 0.5s;
-  background: #f8f9fa;
+  background: #F3F3F3;
 }
 
 a {

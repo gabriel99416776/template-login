@@ -81,6 +81,11 @@
                                 <p>Por favor, preencha todos os campos.</p>
                             </div>
                         <?php } ?>
+                        <?php if (isset($_GET['erro']) && $_GET['erro'] == 4): ?>
+                            <div style="color: red; text-align: center; margin-bottom: 10px;">
+                                <p>Email ou celular já cadastrado!</p>
+                            </div>
+                        <?php endif; ?>
                         <div class="group">
                             <input type="submit" class="button" value="Cadastrar">
                         </div>
@@ -91,7 +96,7 @@
             </div>
         </div>
     </div>
-    <?php if ((isset($_GET['sucess']) && $_GET['sucess'] == 1) || (isset($_GET['erro']) && $_GET['erro'] == 3)): ?>
+    <?php if ((isset($_GET['sucess']) && $_GET['sucess'] == 1) || (isset($_GET['erro']) && $_GET['erro'] == 3) || (isset($_GET['erro']) && $_GET['erro'] == 4)): ?>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('tab-2').checked = true;
