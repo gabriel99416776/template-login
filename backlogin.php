@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["email"], $_POST["senh
     }
 
     // BUSCA O USUÁRIO PELO EMAIL
-    $stmt = $conn->prepare("SELECT * FROM tbl_usuarios WHERE email = ?");
+    $stmt = $conn->prepare("SELECT * FROM tbl_user WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();

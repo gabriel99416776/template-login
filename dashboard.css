@@ -395,3 +395,17 @@ footer p {
   margin-top: 100px;
   margin-bottom: 30px;
 }
+
+
+.sec-receita .row{
+width: 70%;
+margin: auto;
+background-color: #b6b6b67e;
+padding: 50px;
+border-radius: 40px;
+}
+
+.sec-receita .table{
+  width: 70%;
+  margin: 40px auto;
+}

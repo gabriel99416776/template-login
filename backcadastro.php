@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email
     }
 
 
-    $stmt = $conn->prepare("SELECT id FROM tbl_usuarios WHERE email = ? OR celular = ?");
+    $stmt = $conn->prepare("SELECT id FROM tbl_user WHERE email = ? OR celular = ?");
     $stmt->bind_param("ss", $email, $tel);
     $stmt->execute();
     $stmt->store_result();
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email
 
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-    $stmt = $conn->prepare("INSERT INTO tbl_usuarios (`nome`, `email`, `celular`, `senha`) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO tbl_user (`nome`, `email`, `celular`, `senha`) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $nome, $email, $tel, $senhaHash);
     if ($stmt->execute() === TRUE) {
         header("location: index.php?sucess=1");

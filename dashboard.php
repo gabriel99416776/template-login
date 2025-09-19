@@ -143,24 +143,57 @@ $celular = $_SESSION["usuario_celular"];
             </div>
 
         </div>
-        <div id="section-receitas" class="section-content" style="display:none;">
+        <div id="section-receitas" class="section-content sec-receita" style="display:none;">
             <h2>Receitas</h2>
+            <form action="./backtransacao.php" method="POST">
+                <div class="row g-3">
+
+                    <div class="col-md-3 form-floating">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="valor_receita">
+                            <label for="floatingInput">Valor da Receita</label>
+                        </div>
+                        <div class="col-md-3 form-floating">
+                            <select class="form-select" id="categoriaReceita" aria-label="Categoria" name="categoria_receita">
+                            <option selected>Selecione uma Opção</option>
+                            <option value="1">Salário</option>
+                            <option value="2">Bonificação</option>
+                            <option value="3">Diárias</option>
+                            <option value="4">Extras</option>
+                            <option value="5">Outros...</option>
+                        </select>
+                        <label for="categoriaReceita">Tipo de Receita</label>
+                    </div>
+
+                    <div class="col-md-6 form-floating">
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                        <label for="floatingTextarea2">Descrição</label>
+                    </div>
+                    <input type="submit" class="btn btn-primary" value="Adicionar Receita">
+                </div>
+            </form>
+            <table class="table table-success table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">N° da Receita</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td>R$ 1200,00</td>
+                        <td>Salario</td>
+                        <td>Recebi meu salario dia 5</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        <div id="section-despesas" class="section-content" style="display:none;">
+            <h2>Despesas</h2>
             <div class="row g-3">
-                <div class="col-md-3 form-floating">
-                    <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-                    <label for="floatingInput">Ganhos</label>
-                </div>
-                <div class="col-md-3 form-floating">
-                    <select class="form-select" id="categoriaReceita" aria-label="Categoria">
-                        <option selected>Selecione uma Opção</option>
-                        <option value="1">Salário</option>
-                        <option value="2">Bonificação</option>
-                        <option value="3">Diárias</option>
-                        <option value="4">Extras</option>
-                        <option value="5">Outros...</option>
-                    </select>
-                    <label for="categoriaReceita">Tipo de Ganho</label>
-                </div>
                 <div class="col-md-3 form-floating">
                     <input type="text" class="form-control" id="floatingPassword" placeholder="Password">
                     <label for="floatingPassword">Despesas</label>
@@ -176,16 +209,8 @@ $celular = $_SESSION["usuario_celular"];
                     </select>
                     <label for="categoriaReceita">Tipo de Despesas</label>
                 </div>
-                <div class="col-md-6 form-floating">
-                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                    <label for="floatingTextarea2">Observações</label>
-                </div>
-
             </div>
-        </div>
-        <div id="section-despesas" class="section-content" style="display:none;">
-            <h2>Despesas</h2>
-            <p>Lista de despesas cadastradas...</p>
+
         </div>
         <div id="section-relatorios" class="section-content" style="display:none;">
             <h2>Relatórios</h2>
