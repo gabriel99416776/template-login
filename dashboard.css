@@ -372,3 +372,26 @@ footer p {
   right: 0px;
   opacity: 1;
 }
+.section-chart h3,
+.section-chart i {
+    color: #fff;
+    font-size: 25px;
+}
+.section-chart span {
+    color: #fff;
+    font-size: 19px;
+}
+.section-chart .desc{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section-chart .card{
+  padding: 20px;
+}
+
+.title-dash{
+  text-align: center;
+  margin-top: 100px;
+  margin-bottom: 30px;
+}

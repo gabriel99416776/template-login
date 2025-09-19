@@ -21,6 +21,7 @@ $celular = $_SESSION["usuario_celular"];
     <title>Sidebar Menu</title>
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
@@ -28,7 +29,7 @@ $celular = $_SESSION["usuario_celular"];
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.css">
     <!-- JS (jQuery para o OwlCarousel) -->
-     
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -97,75 +98,90 @@ $celular = $_SESSION["usuario_celular"];
     </div>
 
     <main id="main-content">
-        <div id="section-dashboard" class="section-content">
-            <h2>Bem-vindo ao Dashboard!</h2>
+        <div id="section-dashboard" class="section-content section-chart">
+            <h2 class="title-dash">Olá <?= htmlspecialchars($nome); ?>, esse é seu Painel Geral!</h2>
             <div class="row">
                 <div class="col-xl-4 col-lg-6 col-xs-12">
-                    <div class="card bg-cyan">
+                    <div class="card bg-success">
                         <div class="card-body">
-                            <div class="card-block">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <i class="icon-trending_up white font-large-2 float-xs-left"></i>
-                                    </div>
-                                    <div class="media-body white text-xs-right">
-                                        <h3>4124</h3>
-                                        <span>Total de Ganhos</span>
-                                    </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="desc">
+                                    <h3 class="mb-0">R$ 400,00</h3>
+                                    <span>Total de Ganhos</span>
                                 </div>
+                                <i class="bi bi-cash-coin" style="font-size: 2.5rem;"></i>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6 col-xs-12">
-                    <div class="card bg-teal">
+                    <div class="card bg-danger">
                         <div class="card-body">
-                            <div class="card-block">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <i class="icon-usd white font-large-2 float-xs-left"></i>
-                                    </div>
-                                    <div class="media-body white text-xs-right">
-                                        <h3>R4141</h3>
-                                        <span>Total de Despesas</span>
-                                    </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="desc">
+                                    <h3 class="mb-0">R$ 200,00</h3>
+                                    <span>Total de Despesas</span>
                                 </div>
+                                <i class="bi bi-cart-dash" style="font-size: 2.5rem;"></i>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6 col-xs-12">
-                    <div class="card bg-purple">
+                    <div class="card bg-info">
                         <div class="card-body">
-                            <div class="card-block">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <i class="icon-bag3 white font-large-2 float-xs-left"></i>
-                                    </div>
-                                    <div class="media-body white text-xs-right">
-                                        <h3>41441</h3>
-                                        <span>Está Sobrando</span>
-                                    </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="desc">
+                                    <h3 class="mb-0">R$ 200,00</h3>
+                                    <span>Está Sobrando</span>
                                 </div>
+                                <i class="bi bi-clipboard2-check-fill" style="font-size: 2.5rem;"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <?php include("chart1.php"); ?>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <?php include("chart2.php"); ?>
-                    </div>
-                </div>
-            </div>
+
         </div>
         <div id="section-receitas" class="section-content" style="display:none;">
             <h2>Receitas</h2>
-            <p>Lista de receitas cadastradas...</p>
+            <div class="row g-3">
+                <div class="col-md-3 form-floating">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
+                    <label for="floatingInput">Ganhos</label>
+                </div>
+                <div class="col-md-3 form-floating">
+                    <select class="form-select" id="categoriaReceita" aria-label="Categoria">
+                        <option selected>Selecione uma Opção</option>
+                        <option value="1">Salário</option>
+                        <option value="2">Bonificação</option>
+                        <option value="3">Diárias</option>
+                        <option value="4">Extras</option>
+                        <option value="5">Outros...</option>
+                    </select>
+                    <label for="categoriaReceita">Tipo de Ganho</label>
+                </div>
+                <div class="col-md-3 form-floating">
+                    <input type="text" class="form-control" id="floatingPassword" placeholder="Password">
+                    <label for="floatingPassword">Despesas</label>
+                </div>
+
+                <div class="col-md-3 form-floating">
+                    <select class="form-select" id="categoriaReceita" aria-label="Categoria">
+                        <option selected>Selecione uma Opção</option>
+                        <option value="1">Viagem</option>
+                        <option value="2">Compras Pessoais</option>
+                        <option value="3">Saídas</option>
+                        <option value="4">Outros...</option>
+                    </select>
+                    <label for="categoriaReceita">Tipo de Despesas</label>
+                </div>
+                <div class="col-md-6 form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                    <label for="floatingTextarea2">Observações</label>
+                </div>
+
+            </div>
         </div>
         <div id="section-despesas" class="section-content" style="display:none;">
             <h2>Despesas</h2>
