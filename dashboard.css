@@ -22,7 +22,7 @@ body {
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
   transition: 0.5s;
-  background: #F3F3F3;
+  background: #F2F2F7;
 }
 
 a {
@@ -406,6 +406,36 @@ border-radius: 40px;
 }
 
 .sec-receita .table{
+  width: 70%;
+  margin: 40px auto;
+}
+.title-receita{
+  text-align: center;
+  margin-bottom: 50px;
+  margin-top: 100px;
+  color: #106100;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.title-despesa{
+  text-align: center;
+  margin-bottom: 50px;
+  margin-top: 100px;
+  color: #720000;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.sec-despesa .row{
+width: 70%;
+margin: auto;
+background-color: #b6b6b67e;
+padding: 50px;
+border-radius: 40px;
+}
+
+.sec-despesa .table{
   width: 70%;
   margin: 40px auto;
 }

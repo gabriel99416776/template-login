@@ -9,6 +9,33 @@ if (!isset($_SESSION["usuario_id"])) {
 
 $nome = $_SESSION["usuario_nome"];
 $celular = $_SESSION["usuario_celular"];
+
+
+
+
+// Somar receitas do usuário
+$usuario_id = $_SESSION["usuario_id"];
+$sql_total_receitas = "SELECT SUM(valor) AS total_receitas FROM tbl_transacao WHERE usuario_id = '$usuario_id' AND tipo = 'receita'";
+$result_total = mysqli_query($conn, $sql_total_receitas);
+$row_total = mysqli_fetch_assoc($result_total);
+$total_receitas = $row_total['total_receitas'] ?? 0; // se não houver receitas, retorna 0
+
+
+// Somar Despesas do usuário
+$sql_total_despesa = "SELECT SUM(valor) AS total_despesa FROM tbl_transacao WHERE usuario_id = '$usuario_id' AND tipo = 'despesa'";
+$result_total = mysqli_query($conn, $sql_total_despesa);
+$row_total = mysqli_fetch_assoc($result_total);
+$total_despesa = $row_total['total_despesa'] ?? 0;
+
+
+$saldo = $total_receitas - $total_despesa;
+
+
+
+
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -106,8 +133,8 @@ $celular = $_SESSION["usuario_celular"];
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="desc">
-                                    <h3 class="mb-0">R$ 400,00</h3>
-                                    <span>Total de Ganhos</span>
+                                    <h3 class="mb-0">R$ <?= number_format($total_receitas, 2, ',', '.') ?></h3>
+                                    <span>Total de Faturamento</span>
                                 </div>
                                 <i class="bi bi-cash-coin" style="font-size: 2.5rem;"></i>
                             </div>
@@ -119,7 +146,7 @@ $celular = $_SESSION["usuario_celular"];
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="desc">
-                                    <h3 class="mb-0">R$ 200,00</h3>
+                                    <h3 class="mb-0">R$ <?= number_format($total_despesa, 2, ',', '.') ?></h3>
                                     <span>Total de Despesas</span>
                                 </div>
                                 <i class="bi bi-cart-dash" style="font-size: 2.5rem;"></i>
@@ -132,7 +159,7 @@ $celular = $_SESSION["usuario_celular"];
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="desc">
-                                    <h3 class="mb-0">R$ 200,00</h3>
+                                    <h3 class="mb-0">R$ <?= number_format($saldo, 2, ',', '.') ?></h3>
                                     <span>Está Sobrando</span>
                                 </div>
                                 <i class="bi bi-clipboard2-check-fill" style="font-size: 2.5rem;"></i>
@@ -144,28 +171,32 @@ $celular = $_SESSION["usuario_celular"];
 
         </div>
         <div id="section-receitas" class="section-content sec-receita" style="display:none;">
-            <h2>Receitas</h2>
+            <div class="title-receita">
+                <h2>Faturamentos</h2>
+                <p>Aqui você fará a adição de seus lucros.</p>
+            </div>
             <form action="./backtransacao.php" method="POST">
+                <input type="hidden" name="tipo" value="receita">
                 <div class="row g-3">
 
                     <div class="col-md-3 form-floating">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="valor_receita">
-                            <label for="floatingInput">Valor da Receita</label>
-                        </div>
-                        <div class="col-md-3 form-floating">
-                            <select class="form-select" id="categoriaReceita" aria-label="Categoria" name="categoria_receita">
-                            <option selected>Selecione uma Opção</option>
-                            <option value="1">Salário</option>
-                            <option value="2">Bonificação</option>
-                            <option value="3">Diárias</option>
-                            <option value="4">Extras</option>
-                            <option value="5">Outros...</option>
+                        <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="valor" required>
+                        <label for="floatingInput">Valor do Faturamento</label>
+                    </div>
+                    <div class="col-md-3 form-floating">
+                        <select class="form-select" id="categoriaReceita" aria-label="Categoria" name="categoria">
+                            <option value="" disabled selected>Selecione uma opção</option>
+                            <option value="salario">Salário</option>
+                            <option value="bonificacao">Bonificação</option>
+                            <option value="diaria">Diárias</option>
+                            <option value="extras">Extras</option>
+                            <option value="outros">Outros...</option>
                         </select>
-                        <label for="categoriaReceita">Tipo de Receita</label>
+                        <label for="categoriaReceita">Tipo de Faturamento</label>
                     </div>
 
                     <div class="col-md-6 form-floating">
-                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                        <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="descricao">
                         <label for="floatingTextarea2">Descrição</label>
                     </div>
                     <input type="submit" class="btn btn-primary" value="Adicionar Receita">
@@ -174,42 +205,113 @@ $celular = $_SESSION["usuario_celular"];
             <table class="table table-success table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">N° da Receita</th>
+                        <th scope="col">ID da Receita</th>
                         <th scope="col">Valor</th>
                         <th scope="col">Tipo</th>
                         <th scope="col">Descrição</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th>1</th>
-                        <td>R$ 1200,00</td>
-                        <td>Salario</td>
-                        <td>Recebi meu salario dia 5</td>
-                    </tr>
-                    
+                    <?php
+                    $usuario_id = $_SESSION["usuario_id"];
+                    $query = "SELECT * FROM tbl_transacao WHERE usuario_id = '$usuario_id' AND tipo = 'receita'";
+                    $result = mysqli_query($conn, $query);
+
+                    if (mysqli_num_rows($result) > 0) {
+
+                        while ($row = mysqli_fetch_assoc($result)) {
+                    ?>
+                            <tr>
+                                <th scope="row"><?= htmlspecialchars($row["id"])  ?></th>
+                                <td><?= htmlspecialchars($row["valor"]) ?></td>
+                                <td><?= htmlspecialchars($row["categoria_nome"]) ?></td>
+                                <td><?= htmlspecialchars($row["descricao"]) ?></td>
+                            </tr>
+                        <?php
+
+                        }
+                    } else {
+                        ?>
+                        <tr>
+                            <td colspan="4">Nenhuma receita cadastrada.</td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
                 </tbody>
             </table>
         </div>
-        <div id="section-despesas" class="section-content" style="display:none;">
-            <h2>Despesas</h2>
-            <div class="row g-3">
-                <div class="col-md-3 form-floating">
-                    <input type="text" class="form-control" id="floatingPassword" placeholder="Password">
-                    <label for="floatingPassword">Despesas</label>
-                </div>
-
-                <div class="col-md-3 form-floating">
-                    <select class="form-select" id="categoriaReceita" aria-label="Categoria">
-                        <option selected>Selecione uma Opção</option>
-                        <option value="1">Viagem</option>
-                        <option value="2">Compras Pessoais</option>
-                        <option value="3">Saídas</option>
-                        <option value="4">Outros...</option>
-                    </select>
-                    <label for="categoriaReceita">Tipo de Despesas</label>
-                </div>
+        <div id="section-despesas" class="section-content sec-despesa" style="display:none;">
+            <div class="title-despesa">
+                <h2>Despesas</h2>
+                <p>Aqui você fará a adição de suas despesas.</p>
             </div>
+            <form action="./backtransacao.php" method="POST">
+                <input type="hidden" name="tipo" value="despesa">
+                <div class="row g-3">
+
+                    <div class="col-md-3 form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="valor">
+                        <label for="floatingInput">Valor da Despesa</label>
+                    </div>
+                    <div class="col-md-3 form-floating">
+                        <select class="form-select" id="categoriaDepesa" aria-label="Categoria" name="categoria">
+                            <option selected>Selecione uma Opção</option>
+                            <option value="viagem">Viagem</option>
+                            <option value="compras_fisicas">Compras Fisicas</option>
+                            <option value="compras_online">Compras Online</option>
+                            <option value="saidas">Saidas</option>
+                            <option value="outros">Outros...</option>
+                        </select>
+                        <label for="categoriaDepesa">Tipo de Despesa</label>
+                    </div>
+
+                    <div class="col-md-6 form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="descricao">
+                        <label for="floatingTextarea2">Descrição</label>
+                    </div>
+                    <input type="submit" class="btn btn-primary" value="Adicionar Depesa">
+                </div>
+            </form>
+            <table class="table table-danger table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID da Despesa</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $usuario_id = $_SESSION["usuario_id"];
+                    $query = "SELECT * FROM tbl_transacao WHERE usuario_id = '$usuario_id' AND tipo = 'despesa'";
+                    $result = mysqli_query($conn, $query);
+
+                    if (mysqli_num_rows($result) > 0) {
+
+                        while ($row = mysqli_fetch_assoc($result)) {
+                    ?>
+                            <tr>
+                                <th scope="row"><?= htmlspecialchars($row["id"])  ?></th>
+                                <td><?= htmlspecialchars($row["valor"]) ?></td>
+                                <td><?= htmlspecialchars($row["categoria_nome"]) ?></td>
+                                <td><?= htmlspecialchars($row["descricao"]) ?></td>
+                            </tr>
+                        <?php
+
+                        }
+                    } else {
+                        ?>
+                        <tr>
+                            <td colspan="4">Nenhuma despesa cadastrada.</td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
 
         </div>
         <div id="section-relatorios" class="section-content" style="display:none;">
@@ -220,69 +322,68 @@ $celular = $_SESSION["usuario_celular"];
             <h2>Painel do Usuário</h2>
             <p>Informações da sua conta...</p>
         </div>
-    </main>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
-    <script src="dashboard.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.js"></script>
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+        <script src="dashboard.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.js"></script>
 
-    <script>
-        function showSection(section) {
-            document.querySelectorAll('.section-content').forEach(div => div.style.display = 'none');
-            document.getElementById('section-' + section).style.display = 'block';
-        }
-
-        document.getElementById('menu-dashboard').addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection('dashboard');
-        });
-        document.getElementById('menu-receitas').addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection('receitas');
-        });
-        document.getElementById('menu-despesas').addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection('despesas');
-        });
-        document.getElementById('menu-relatorios').addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection('relatorios');
-        });
-        document.getElementById('menu-painel').addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection('painel');
-        });
-        // Troca a seta quando o dropdown abre/fecha
-        document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
-            toggle.addEventListener('show.bs.dropdown', function() {
-                this.querySelector('.dropdown-arrow').classList.remove('bx-chevron-down');
-                this.querySelector('.dropdown-arrow').classList.add('bx-chevron-up');
-            });
-            toggle.addEventListener('hide.bs.dropdown', function() {
-                this.querySelector('.dropdown-arrow').classList.remove('bx-chevron-up');
-                this.querySelector('.dropdown-arrow').classList.add('bx-chevron-down');
-            });
-        });
-        $('.owl-carousel').owlCarousel({
-            loop: true,
-            margin: 10,
-            dots: false,
-            nav: true,
-            autoplay: true,
-            responsive: {
-                0: {
-                    items: 1
-                },
-                600: {
-                    items: 1
-                },
-                1000: {
-                    items: 1
-                }
+        <script>
+            function showSection(section) {
+                document.querySelectorAll('.section-content').forEach(div => div.style.display = 'none');
+                document.getElementById('section-' + section).style.display = 'block';
             }
-        });
-    </script>
+
+            document.getElementById('menu-dashboard').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('dashboard');
+            });
+            document.getElementById('menu-receitas').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('receitas');
+            });
+            document.getElementById('menu-despesas').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('despesas');
+            });
+            document.getElementById('menu-relatorios').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('relatorios');
+            });
+            document.getElementById('menu-painel').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('painel');
+            });
+            // Troca a seta quando o dropdown abre/fecha
+            document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+                toggle.addEventListener('show.bs.dropdown', function() {
+                    this.querySelector('.dropdown-arrow').classList.remove('bx-chevron-down');
+                    this.querySelector('.dropdown-arrow').classList.add('bx-chevron-up');
+                });
+                toggle.addEventListener('hide.bs.dropdown', function() {
+                    this.querySelector('.dropdown-arrow').classList.remove('bx-chevron-up');
+                    this.querySelector('.dropdown-arrow').classList.add('bx-chevron-down');
+                });
+            });
+            $('.owl-carousel').owlCarousel({
+                loop: true,
+                margin: 10,
+                dots: false,
+                nav: true,
+                autoplay: true,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 1
+                    },
+                    1000: {
+                        items: 1
+                    }
+                }
+            });
+        </script>
 </body>
 
 </html>
