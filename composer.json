@@ -1,0 +1,15 @@
+{
+    "name": "pc/template-login",
+    "autoload": {
+        "psr-4": {
+            "Pc\\TemplateLogin\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gabriel De Sousa",
+            "email": "gabrielfortaleza4@gmail.com"
+        }
+    ],
+    "require": {}
+}

@@ -439,3 +439,49 @@ border-radius: 40px;
   width: 70%;
   margin: 40px auto;
 }
+.tabela-relatorio{
+  width: 70%;
+  margin: 100px auto auto;
+  background-color: #e9e9e97e;
+  padding: 30px;
+  border-radius: 40px;
+}
+.tabela-relatorio h2{
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  color: #031530;
+  font-weight: bold;
+  font-size: 35px;
+
+}
+
+
+.card-relatorio h3,
+.card-relatorio i,
+.card-relatorio span {
+  color: #fff;
+  font-size: 19px;
+}
+
+.tabela-relatorio a {
+  display: flex;
+  justify-content: center;
+  background-color: #031530;
+  color: #fff;
+  font-size: 15px;
+  border-radius: 20px;
+  padding: 8px;
+  width: 20%;
+  margin: auto;
+}
+
+.tabela-relatorio a:hover {
+  background-color: #104ba3;
+  color: #fff;
+  text-decoration: none;
+  transition: .3s ease-in-out;
+}
+.tabela-relatorio a:not(:hover) {
+  transition: .2s ease-in-out;
+}

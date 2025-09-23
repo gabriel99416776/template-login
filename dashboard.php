@@ -27,14 +27,79 @@ $result_total = mysqli_query($conn, $sql_total_despesa);
 $row_total = mysqli_fetch_assoc($result_total);
 $total_despesa = $row_total['total_despesa'] ?? 0;
 
-
-$saldo = $total_receitas - $total_despesa;
-
+$saldo = (float)$total_receitas - (float)$total_despesa;
 
 
 
 
 
+
+
+$sql_grafico = "SELECT tipo, SUM(valor) AS total FROM tbl_transacao WHERE usuario_id = '$usuario_id' GROUP BY tipo";
+$result_grafico = mysqli_query($conn, $sql_grafico);
+
+$data_grafico = array();
+$data_grafico[] = array('Tipo', 'Total', array('role' => 'style')); // adiciona coluna style
+
+while ($row_grafico = mysqli_fetch_assoc($result_grafico)) {
+    $tipo = $row_grafico['tipo'];
+    $total = (float)$row_grafico['total'];
+
+    // Define a cor baseada no tipo
+    $cor = ($tipo === 'receita') ? '#198754' : '#DC3545';
+
+    $data_grafico[] = array($tipo, $total, $cor);
+}
+
+$json_data_grafico = json_encode($data_grafico);
+
+
+$consultaSQL = "SELECT 
+    tipo,
+    SUM(valor) AS total,
+    DATE(data) AS data_transacao
+FROM 
+    tbl_transacao
+WHERE 
+    usuario_id = $usuario_id AND
+    data BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE()
+GROUP BY 
+    tipo, DATE(data)
+ORDER BY
+    DATE(data), tipo;";
+
+$resultadoConsulta = $conn->query($consultaSQL);
+
+$dadosGrafico = array();
+$dadosGrafico[] = array('Data', 'Receitas', 'Despesas');
+
+$valoresReceitas = array();
+$valoresDespesas = array();
+
+while ($linha = $resultadoConsulta->fetch_assoc()) {
+    $dataTransacao = $linha['data_transacao'];
+    $tipoTransacao = $linha['tipo'];
+    $totalTransacao = (float)$linha['total'];
+
+    if ($tipoTransacao == 'receita') {
+        $valoresReceitas[$dataTransacao] = $totalTransacao;
+    } elseif ($tipoTransacao == 'despesa') {
+        $valoresDespesas[$dataTransacao] = $totalTransacao;
+    }
+}
+
+$dataInicial = new DateTime('-6 days');
+$dataFinal = new DateTime('today');
+
+for ($data = $dataInicial; $data <= $dataFinal; $data->modify('+1 day')) {
+    $dataString = $data->format('Y-m-d');
+    $receitaDia = isset($valoresReceitas[$dataString]) ? $valoresReceitas[$dataString] : 0;
+    $despesaDia = isset($valoresDespesas[$dataString]) ? $valoresDespesas[$dataString] : 0;
+
+    $dadosGrafico[] = array($dataString, $receitaDia, $despesaDia);
+}
+
+$jsonDataGrafico = json_encode($dadosGrafico);
 
 ?>
 
@@ -127,6 +192,8 @@ $saldo = $total_receitas - $total_despesa;
     <main id="main-content">
         <div id="section-dashboard" class="section-content section-chart">
             <h2 class="title-dash">Olá <?= htmlspecialchars($nome); ?>, esse é seu Painel Geral!</h2>
+
+            <!-- Cards de resumo -->
             <div class="row">
                 <div class="col-xl-4 col-lg-6 col-xs-12">
                     <div class="card bg-success">
@@ -160,7 +227,11 @@ $saldo = $total_receitas - $total_despesa;
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="desc">
                                     <h3 class="mb-0">R$ <?= number_format($saldo, 2, ',', '.') ?></h3>
-                                    <span>Está Sobrando</span>
+                                    <?php if ($saldo < 0): ?>
+                                        <span>Está Devendo</span>
+                                    <?php else: ?>
+                                        <span>Está Sobrando</span>
+                                    <?php endif; ?>
                                 </div>
                                 <i class="bi bi-clipboard2-check-fill" style="font-size: 2.5rem;"></i>
                             </div>
@@ -169,7 +240,33 @@ $saldo = $total_receitas - $total_despesa;
                 </div>
             </div>
 
+            <!-- Charts -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body" style="height: 400px;">
+                            <div id="piechart" style="width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body" style="height: 400px;">
+                            <div id="columnchart_values" style="width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-body" style="height: 400px;">
+                        <div id="chart_div" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div id="section-receitas" class="section-content sec-receita" style="display:none;">
             <div class="title-receita">
                 <h2>Faturamentos</h2>
@@ -314,9 +411,75 @@ $saldo = $total_receitas - $total_despesa;
         </div>
 
         </div>
-        <div id="section-relatorios" class="section-content" style="display:none;">
+        <div id="section-relatorios" class="section-content tabela-relatorio" style="display:none;">
             <h2>Relatórios</h2>
-            <p>Gráficos e relatórios financeiros...</p>
+            <a href="./gerar_pdf.php" class="gerar-pdf">Gerar PDF do Relatorio</a>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID Transação</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $usuario_id = $_SESSION["usuario_id"];
+                    $query = "SELECT * FROM tbl_transacao WHERE usuario_id = '$usuario_id' ORDER BY tipo = 'receita' DESC";
+                    $result = mysqli_query($conn, $query);
+
+                    if (mysqli_num_rows($result) > 0) {
+
+
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $classe = ($row["tipo"] === "receita") ? "text-success" : "text-danger";
+                    ?>
+                            <tr>
+                                <th scope="row"><?= htmlspecialchars($row["id"])  ?></th>
+                                <td>R$ <?= htmlspecialchars($row["valor"]) ?></td>
+                                <td class="<?= $classe ?>"><?= htmlspecialchars($row["tipo"]) ?></td>
+                                <td><?= htmlspecialchars($row["descricao"]) ?></td>
+                            </tr>
+                        <?php
+                        }
+                    } else {
+                        ?>
+                        <tr>
+                            <td colspan="4">Nenhuma transação cadastrada.</td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+
+                </tbody>
+            </table>
+            <div class="col-xl-4 col-lg-6 col-xs-12">
+                <?php
+                if ($saldo < 0) {
+                    $cor = 'bg-danger';
+                    $icone = 'bi bi-exclamation-lg';
+                } elseif ($saldo > 0) {
+                    $cor = 'bg-success';
+                    $icone = 'bi bi-check-lg';
+                }
+                ?>
+                <div class="card card-relatorio <?= $cor ?>">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="desc">
+                                <h3 class="mb-0">R$ <?= number_format($saldo, 2, ',', '.') ?></h3>
+                                <?php if ($saldo < 0): ?>
+                                    <span>Está Devendo !!!</span>
+                                <?php else: ?>
+                                    <span>Está Sobrando</span>
+                                <?php endif; ?>
+                            </div>
+                            <i class="<?= $icone ?>" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="section-painel" class="section-content" style="display:none;">
             <h2>Painel do Usuário</h2>
@@ -329,6 +492,81 @@ $saldo = $total_receitas - $total_despesa;
         <script src="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.js"></script>
 
         <script>
+            function drawColumnChart() {
+                var data = google.visualization.arrayToDataTable(<?= $json_data_grafico ?>);
+                var options = {
+                    width: '100%',
+                    height: '100%',
+                    legend: {
+                        position: 'none'
+                    },
+                    vAxis: {
+                        title: 'Valor'
+                    },
+                    hAxis: {
+                        title: 'Tipo'
+                    }
+                };
+                var chart = new google.visualization.ColumnChart(document.getElementById('columnchart_values'));
+                chart.draw(data, options);
+            }
+
+            function drawPieChart() {
+                var data = google.visualization.arrayToDataTable(<?= $json_data_grafico ?>);
+                var options = {
+                    width: '100%',
+                    height: '100%',
+                    is3D: true,
+                    pieSliceText: 'value',
+                    colors: ['#198754', '#DC3545']
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                chart.draw(data, options);
+            }
+
+            function drawAreaChart() {
+                var data = google.visualization.arrayToDataTable(<?= $jsonDataGrafico ?>);
+                var options = {
+                    width: '100%',
+                    height: '100%',
+                    series: {
+                        0: {
+                            color: '#198754'
+                        },
+                        1: {
+                            color: '#DC3545'
+                        }
+                    },
+                    hAxis: {
+                        title: 'Dias'
+                    },
+                    vAxis: {
+                        minValue: 0
+                    }
+                };
+                var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+            }
+
+            function redrawAll() {
+                drawColumnChart();
+                drawPieChart();
+                drawAreaChart();
+            }
+
+            google.charts.load('current', {
+                packages: ['corechart']
+            });
+            google.charts.setOnLoadCallback(redrawAll);
+
+            // redesenha quando redimensiona a tela
+            window.addEventListener('resize', redrawAll);
+
+            // redesenha se o menu lateral muda
+            document.getElementById('header-toggle').addEventListener('click', function() {
+                setTimeout(redrawAll, 300); // espera a animação do menu
+            });
+
             function showSection(section) {
                 document.querySelectorAll('.section-content').forEach(div => div.style.display = 'none');
                 document.getElementById('section-' + section).style.display = 'block';
