@@ -532,3 +532,24 @@ footer p {
     #f0f0f0
   );
 }
+
+.botao-trocar{
+  margin-top: 10px;
+  background-color: #004bbd;
+  color: #fff;
+  padding: 5px 17px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.botao-trocar:hover{
+  background-color: #cacaca;
+  color: #141414;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.botao-trocar:not(:hover){
+  transition: 0.2s ease-in-out;
+}

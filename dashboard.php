@@ -12,9 +12,10 @@ $result = mysqli_query($conn, $query);
 
 if (mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_array($result);
-    $nome = $row["nome"];
-    $email = $row["email"];
-    $celular = $row["celular"];
+    $nome = $row["nome"] ?? '';
+    $email = $row["email"] ?? '';
+    $celular = $row["celular"] ?? '';
+    $profissao = $row["profissao"] ?? '';
     // Expressão regular para formatar
     $celular_formatado = preg_replace('/(\d{2})(\d{1})(\d{4})(\d{4})/', '($1) $2 $3-$4', $celular);
     $foto_64 = $row["foto_64"];
@@ -189,12 +190,14 @@ $jsonDataGrafico = json_encode($dadosGrafico);
 
                     <?php
                     if (!empty($foto_64)) {
-                        $foto_64 = "oi";
+                        // Foto salva no banco (base64)
+                        $foto_exibir = "data:image/jpeg;base64," . $foto_64;
                     } else {
-                        $foto_64 = "./assets/foto_user.png";
+                        // Foto padrão
+                        $foto_exibir = "./assets/foto_user.png";
                     }
                     ?>
-                    <img src="<?= $foto_64 ?>" alt="Avatar" class="img-fluid my-5" style="width: 35px; border-radius: 50%;"> 
+                    <img src="<?= $foto_exibir ?>" alt="Avatar" class="img-fluid my-5" style="width: 40px; border-radius: 50%; height: 40px; object-fit:cover;">
 
 
                     <span class="nav_name ms-2"><?php echo htmlspecialchars($nome); ?></span>
@@ -530,20 +533,42 @@ $jsonDataGrafico = json_encode($dadosGrafico);
                         <div class="col col-lg-9 mb-4 mb-lg-0">
                             <div class="card mb-3" style="border-radius: .5rem;">
                                 <div class="row g-0">
-                                    <div class="col-md-4 gradient-custom text-center text-white" style="background-color: #031530;"
-                                        style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                                    <div class="col-md-4 gradient-custom text-center text-white"
+                                        style="background-color: #031530; border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+
                                         <?php
                                         if (!empty($foto_64)) {
-                                            $foto_64 = "oi";
+                                            $foto_exibir = "data:image/jpeg;base64," . $foto_64;
                                         } else {
-                                            $foto_64 = "./assets/foto_user.png";
+                                            $foto_exibir = "./assets/foto_user.png";
                                         }
                                         ?>
-                                        <img src="<?= $foto_64 ?>" alt="Avatar" class="img-fluid my-5" style="width: 150px;" />
-                                        <h5><?= htmlspecialchars($nome) ?></h5>
-                                        <p>Web Designer</p>
+
+                                        <!-- bloco avatar + botão -->
+                                        <div class="d-flex flex-column align-items-center">
+                                            <img id="avatar" src="<?= $foto_exibir ?>"
+                                                alt="Avatar" class="img-fluid rounded-circle"
+                                                style="width: 100px; height:100px; object-fit:cover; margin-top: 30px" />
+
+                                            <!-- Botão trocar foto logo embaixo -->
+                                            <button class=" botao-trocar"
+                                                onclick="document.getElementById('fileInput').click();">
+                                                Trocar Foto
+                                            </button>
+                                        </div>
+
+                                        <!-- Input escondido -->
+                                        <form id="formFoto" method="post" enctype="multipart/form-data" action="./salvar_foto.php">
+                                            <input type="file" id="fileInput" name="foto" accept="image/*" style="display:none;">
+                                            <input type="hidden" id="fotoBase64" name="fotoBase64">
+                                        </form>
+
+                                        <h5 class="mt-3"><?= htmlspecialchars($nome) ?></h5>
+                                        <p><?= htmlspecialchars($profissao) ?></p>
                                         <i class="far fa-edit mb-5"></i>
                                     </div>
+
+
                                     <div class="col-md-8">
                                         <div class="card-body p-4">
                                             <h6>Informações</h6>
@@ -577,6 +602,7 @@ $jsonDataGrafico = json_encode($dadosGrafico);
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -591,6 +617,22 @@ $jsonDataGrafico = json_encode($dadosGrafico);
         <script src="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.js"></script>
 
         <script>
+            document.getElementById("fileInput").addEventListener("change", function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        // preview da imagem
+                        document.getElementById("avatar").src = reader.result;
+                        // salvar no hidden input
+                        document.getElementById("fotoBase64").value = reader.result.split(",")[1];
+                        // envia formulário automaticamente
+                        document.getElementById("formFoto").submit();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
             function drawColumnChart() {
                 var data = google.visualization.arrayToDataTable(<?= $json_data_grafico ?>);
                 var options = {

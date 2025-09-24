@@ -65,6 +65,10 @@
                             <input id="pass" type="text" class="input" name="tel">
                         </div>
                         <div class="group">
+                            <label for="prof" class="label">Profissão</label>
+                            <input id="prof" type="text" class="input" name="profissao">
+                        </div>
+                        <div class="group">
                             <label for="pass" class="label">Senha</label>
                             <input id="pass" type="password" class="input" data-type="password" name="senha">
                         </div>

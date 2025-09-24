@@ -2,10 +2,11 @@
 
 include("./conexao.php");
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email"], $_POST["tel"], $_POST["senha"])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email"], $_POST["tel"], $_POST["senha"], $_POST["profissao"])) {
     $nome = $_POST["nome"];
     $email = $_POST["email"];
     $tel = $_POST["tel"];
+    $profissao = $_POST["profissao"];
     $senha = $_POST["senha"];
 
     
@@ -28,8 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"], $_POST["email
 
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-    $stmt = $conn->prepare("INSERT INTO tbl_user (`nome`, `email`, `celular`, `senha`) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nome, $email, $tel, $senhaHash);
+    $stmt = $conn->prepare("INSERT INTO tbl_user (`nome`, `email`, `celular`, `profissao`, `senha`) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $nome, $email, $tel, $senhaHash);
     if ($stmt->execute() === TRUE) {
         header("location: index.php?sucess=1");
     } else {
