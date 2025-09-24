@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap");
 :root {
   --header-height: 3rem;
   --nav-width: 68px;
@@ -6,6 +8,7 @@
   --first-color-light: #afa5d9;
   --white-color: #f7f6fb;
   --body-font: "Nunito", sans-serif;
+  --font-site: "Alan Sans", sans-serif;
   --normal-font-size: 1rem;
   --z-fixed: 100;
 }
@@ -22,7 +25,7 @@ body {
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
   transition: 0.5s;
-  background: #F2F2F7;
+  background: #f2f2f7;
 }
 
 a {
@@ -374,88 +377,92 @@ footer p {
 }
 .section-chart h3,
 .section-chart i {
-    color: #fff;
-    font-size: 25px;
+  color: #fff;
+  font-size: 25px;
 }
 .section-chart span {
-    color: #fff;
-    font-size: 19px;
+  color: #fff;
+  font-size: 19px;
 }
-.section-chart .desc{
+.section-chart .desc {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.section-chart .card{
+.section-chart .card {
   padding: 20px;
 }
 
-.title-dash{
+.title-dash {
   text-align: center;
   margin-top: 100px;
   margin-bottom: 30px;
+  letter-spacing: 1px;
+  font-size: 30px;
+  font-family: var(--font-site);
+  color: #031530;
 }
 
-
-.sec-receita .row{
-width: 70%;
-margin: auto;
-background-color: #b6b6b67e;
-padding: 50px;
-border-radius: 40px;
+.sec-receita .row {
+  width: 70%;
+  margin: auto;
+  background-color: #ececec7e;
+  padding: 50px;
+  border-radius: 40px;
 }
 
-.sec-receita .table{
+.sec-receita .table {
   width: 70%;
   margin: 40px auto;
 }
-.title-receita{
+.title-receita {
   text-align: center;
   margin-bottom: 50px;
   margin-top: 100px;
   color: #106100;
-  font-weight: bold;
   font-size: 25px;
+  letter-spacing: 1px;
+  font-family: var(--font-site);
 }
 
-.title-despesa{
+.title-despesa {
   text-align: center;
   margin-bottom: 50px;
   margin-top: 100px;
   color: #720000;
-  font-weight: bold;
   font-size: 25px;
+  letter-spacing: 1px;
+  font-family: var(--font-site);
 }
 
-.sec-despesa .row{
-width: 70%;
-margin: auto;
-background-color: #b6b6b67e;
-padding: 50px;
-border-radius: 40px;
+.sec-despesa .row {
+  width: 70%;
+  margin: auto;
+  background-color: #ececec7e;
+  padding: 50px;
+  border-radius: 40px;
 }
 
-.sec-despesa .table{
+.sec-despesa .table {
   width: 70%;
   margin: 40px auto;
 }
-.tabela-relatorio{
+.tabela-relatorio {
   width: 70%;
   margin: 100px auto auto;
   background-color: #e9e9e97e;
   padding: 30px;
   border-radius: 40px;
 }
-.tabela-relatorio h2{
+.tabela-relatorio h2 {
   text-align: center;
   margin-bottom: 20px;
   margin-top: 20px;
   color: #031530;
-  font-weight: bold;
   font-size: 35px;
-
+  letter-spacing: 1px;
+  font-family: var(--font-site);
 }
-
 
 .card-relatorio h3,
 .card-relatorio i,
@@ -480,8 +487,48 @@ border-radius: 40px;
   background-color: #104ba3;
   color: #fff;
   text-decoration: none;
-  transition: .3s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 .tabela-relatorio a:not(:hover) {
-  transition: .2s ease-in-out;
+  transition: 0.2s ease-in-out;
+}
+.linha {
+  border: 0;
+  width: 60%;
+  margin: 30px auto 0 auto;
+  height: 3px !important;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0,
+    #00b9ff,
+    #26ff00,
+    #f0f0f0
+  );
+}
+
+.linha-red {
+  border: 0;
+  width: 60%;
+  margin: 30px auto 0 auto;
+  height: 3px !important;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0,
+    #ff9900,
+    #ff0000,
+    #f0f0f0
+  );
+}
+.linha-principal {
+  border: 0;
+  width: 60%;
+  margin: 30px auto 50px auto;
+  height: 3px !important;
+  background-image: linear-gradient(
+    to right,
+    #f0f0f0,
+    #0b3a81,
+    #031530,
+    #f0f0f0
+  );
 }

@@ -6,9 +6,26 @@ if (!isset($_SESSION["usuario_id"])) {
     header("location: index.php");
     exit;
 }
+$usuario_id = $_SESSION["usuario_id"];
+$query = "SELECT * FROM tbl_user WHERE id = '$usuario_id'";
+$result = mysqli_query($conn, $query);
 
-$nome = $_SESSION["usuario_nome"];
-$celular = $_SESSION["usuario_celular"];
+if (mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_array($result);
+    $nome = $row["nome"];
+    $email = $row["email"];
+    $celular = $row["celular"];
+    // Expressão regular para formatar
+    $celular_formatado = preg_replace('/(\d{2})(\d{1})(\d{4})(\d{4})/', '($1) $2 $3-$4', $celular);
+    $foto_64 = $row["foto_64"];
+} else {
+    // Usuário não encontrado, redirecionar para a página de login
+    header("location: index.php");
+    exit;
+}
+
+
+
 
 
 
@@ -169,7 +186,17 @@ $jsonDataGrafico = json_encode($dadosGrafico);
             </div>
             <div class="dropdown nav_link" style="display: flex; align-items: center;">
                 <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
-                    <img src="https://res.cloudinary.com/dpjpz26qm/image/upload/v1674890312/codepen/avatar/man_1_cpqkhl.png" class="img-fluid" alt="" style="width: 35px; border-radius: 50%;">
+
+                    <?php
+                    if (!empty($foto_64)) {
+                        $foto_64 = "oi";
+                    } else {
+                        $foto_64 = "./assets/foto_user.png";
+                    }
+                    ?>
+                    <img src="<?= $foto_64 ?>" alt="Avatar" class="img-fluid my-5" style="width: 35px; border-radius: 50%;"> 
+
+
                     <span class="nav_name ms-2"><?php echo htmlspecialchars($nome); ?></span>
                     <i class='bx bx-chevron-down ms-2 dropdown-arrow'></i>
                 </a>
@@ -192,7 +219,16 @@ $jsonDataGrafico = json_encode($dadosGrafico);
     <main id="main-content">
         <div id="section-dashboard" class="section-content section-chart">
             <h2 class="title-dash">Olá <?= htmlspecialchars($nome); ?>, esse é seu Painel Geral!</h2>
-
+            <hr class="linha-principal">
+            <?php
+            if ($saldo < 0) {
+                $cor = 'bg-danger';
+                $icone = 'bi bi-exclamation-lg';
+            } elseif ($saldo > 0) {
+                $cor = 'bg-success';
+                $icone = 'bi bi-check-lg';
+            }
+            ?>
             <!-- Cards de resumo -->
             <div class="row">
                 <div class="col-xl-4 col-lg-6 col-xs-12">
@@ -222,18 +258,18 @@ $jsonDataGrafico = json_encode($dadosGrafico);
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6 col-xs-12">
-                    <div class="card bg-info">
+                    <div class="card  <?= $cor ?>">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="desc">
                                     <h3 class="mb-0">R$ <?= number_format($saldo, 2, ',', '.') ?></h3>
                                     <?php if ($saldo < 0): ?>
-                                        <span>Está Devendo</span>
+                                        <span>Está Devendo !!!</span>
                                     <?php else: ?>
                                         <span>Está Sobrando</span>
                                     <?php endif; ?>
                                 </div>
-                                <i class="bi bi-clipboard2-check-fill" style="font-size: 2.5rem;"></i>
+                                <i class="<?= $icone ?>" style="font-size: 2.5rem;"></i>
                             </div>
                         </div>
                     </div>
@@ -271,6 +307,7 @@ $jsonDataGrafico = json_encode($dadosGrafico);
             <div class="title-receita">
                 <h2>Faturamentos</h2>
                 <p>Aqui você fará a adição de seus lucros.</p>
+                <hr class="linha">
             </div>
             <form action="./backtransacao.php" method="POST">
                 <input type="hidden" name="tipo" value="receita">
@@ -342,6 +379,7 @@ $jsonDataGrafico = json_encode($dadosGrafico);
             <div class="title-despesa">
                 <h2>Despesas</h2>
                 <p>Aqui você fará a adição de suas despesas.</p>
+                <hr class="linha-red">
             </div>
             <form action="./backtransacao.php" method="POST">
                 <input type="hidden" name="tipo" value="despesa">
@@ -483,7 +521,68 @@ $jsonDataGrafico = json_encode($dadosGrafico);
         </div>
         <div id="section-painel" class="section-content" style="display:none;">
             <h2>Painel do Usuário</h2>
-            <p>Informações da sua conta...</p>
+
+
+
+            <section style="background-color: #f4f5f7;">
+                <div class="container py-5 h-100">
+                    <div class="row d-flex justify-content-center align-items-center h-100">
+                        <div class="col col-lg-9 mb-4 mb-lg-0">
+                            <div class="card mb-3" style="border-radius: .5rem;">
+                                <div class="row g-0">
+                                    <div class="col-md-4 gradient-custom text-center text-white" style="background-color: #031530;"
+                                        style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                                        <?php
+                                        if (!empty($foto_64)) {
+                                            $foto_64 = "oi";
+                                        } else {
+                                            $foto_64 = "./assets/foto_user.png";
+                                        }
+                                        ?>
+                                        <img src="<?= $foto_64 ?>" alt="Avatar" class="img-fluid my-5" style="width: 150px;" />
+                                        <h5><?= htmlspecialchars($nome) ?></h5>
+                                        <p>Web Designer</p>
+                                        <i class="far fa-edit mb-5"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body p-4">
+                                            <h6>Informações</h6>
+                                            <hr class="mt-0 mb-4">
+                                            <div class="row pt-1">
+                                                <div class="col-6 mb-3">
+                                                    <h6>Email</h6>
+                                                    <p class="text-muted"><?= htmlspecialchars($email) ?></p>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <h6>Celular</h6>
+                                                    <p class="text-muted"><?= htmlspecialchars($celular_formatado) ?></p>
+                                                </div>
+                                            </div>
+                                            <h6>Projects</h6>
+                                            <hr class="mt-0 mb-4">
+                                            <div class="row pt-1">
+                                                <div class="col-6 mb-3">
+                                                    <h6>Recent</h6>
+                                                    <p class="text-muted">Lorem ipsum</p>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <h6>Most Viewed</h6>
+                                                    <p class="text-muted">Dolor sit amet</p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-start">
+                                                <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
+                                                <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
+                                                <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- Scripts -->
